@@ -39,7 +39,7 @@ export async function updateR2Config(configs: any) {
     SET config_value = CASE
        WHEN config_key = 'r2_accesskey_id' THEN ${configs.r2AccesskeyId}
        WHEN config_key = 'r2_accesskey_secret' THEN ${configs.r2AccesskeySecret}
-       WHEN config_key = 'r2_endpoint' THEN ${configs.r2Endpoint}
+       WHEN config_key = 'r2_account_id' THEN ${configs.r2AccountId}
        WHEN config_key = 'r2_bucket' THEN ${configs.r2Bucket}
        WHEN config_key = 'r2_storage_folder' THEN ${configs.r2StorageFolder}
        WHEN config_key = 'r2_public_domain' THEN ${configs.r2PublicDomain}
@@ -47,7 +47,7 @@ export async function updateR2Config(configs: any) {
        ELSE 'N&A'
     END,
         updated_at = NOW()
-    WHERE config_key IN ('r2_accesskey_id', 'r2_accesskey_secret', 'r2_endpoint', 'r2_bucket', 'r2_storage_folder', 'r2_public_domain', 'r2_direct_download');
+    WHERE config_key IN ('r2_accesskey_id', 'r2_accesskey_secret', 'r2_account_id', 'r2_bucket', 'r2_storage_folder', 'r2_public_domain', 'r2_direct_download');
   `
 }
 
@@ -86,6 +86,7 @@ export async function updateCustomInfo(payload: {
   umamiHost: string
   umamiAnalytics: string
   maxUploadFiles: number
+  customIndexOriginEnable: boolean
 }) {
   try {
     const {
@@ -101,7 +102,8 @@ export async function updateCustomInfo(payload: {
       previewQuality,
       umamiHost,
       umamiAnalytics,
-      maxUploadFiles
+      maxUploadFiles,
+      customIndexOriginEnable,
     } = payload
 
     await db.$transaction(async (tx) => {
@@ -226,88 +228,18 @@ export async function updateCustomInfo(payload: {
           updatedAt: new Date(),
         }
       })
+      await tx.configs.update({
+        where: {
+          config_key: 'custom_index_origin_enable'
+        },
+        data: {
+          config_value: customIndexOriginEnable ? 'true' : 'false',
+          updatedAt: new Date(),
+        }
+      })
     })
   } catch (error) {
     console.error('Error updating custom info:', error)
     throw error
   }
-}
-
-/**
- * 保存授权临时密钥
- * @param token 临时密钥
- */
-export async function saveAuthTemplateSecret(token: string) {
-  await db.configs.update({
-    where: {
-      config_key: 'auth_temp_secret'
-    },
-    data: {
-      config_value: token,
-      updatedAt: new Date()
-    }
-  })
-}
-
-/**
- * 保存授权密钥
- * @param enable 是否启用
- * @param secret 密钥
- */
-export async function saveAuthSecret(enable: string, secret: string) {
-  await db.$transaction(async (tx) => {
-    await tx.configs.update({
-      where: {
-        config_key: 'auth_enable'
-      },
-      data: {
-        config_value: enable,
-        updatedAt: new Date()
-      }
-    })
-    await tx.configs.update({
-      where: {
-        config_key: 'auth_secret'
-      },
-      data: {
-        config_value: secret,
-        updatedAt: new Date()
-      }
-    })
-  })
-}
-
-/**
- * 删除授权密钥
- */
-export async function deleteAuthSecret() {
-  await db.$transaction(async (tx) => {
-    await tx.configs.update({
-      where: {
-        config_key: 'auth_enable'
-      },
-      data: {
-        config_value: 'false',
-        updatedAt: new Date()
-      }
-    })
-    await tx.configs.update({
-      where: {
-        config_key: 'auth_secret'
-      },
-      data: {
-        config_value: '',
-        updatedAt: new Date()
-      }
-    })
-    await tx.configs.update({
-      where: {
-        config_key: 'auth_temp_secret'
-      },
-      data: {
-        config_value: '',
-        updatedAt: new Date()
-      }
-    })
-  })
 }

@@ -16,11 +16,12 @@
     "title": "歓迎ログイン",
     "email": "メール",
     "password": "パスワード",
-    "login": "ログイン",
     "forget": "パスワードをお忘れですか？",
     "otp": "二要素認証コード",
     "goHome": "ホームに戻る",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "signUp": "登録する",
+    "signIn": "ログイン"
   },
   "Link": {
     "home": "ホーム",
@@ -219,7 +220,8 @@
     "umamiHost": "Umami Website Host",
     "umamiAnalytics": "Umami Website ID",
     "maxUploadFiles": "最大アップロードファイル数",
-    "inputMaxUploadFiles": "最大アップロードファイル数を入力してください"
+    "inputMaxUploadFiles": "最大アップロードファイル数を入力してください",
+    "customIndexOriginEnable": "ホームページで原画を表示するかどうか（おすすめ画像モード）"
   },
   "Password": {
     "onePassword": "旧パスワード",
@@ -250,7 +252,7 @@
     "s3_direct_download": "S3 ダイレクトアップロードモードを有効にするかどうか、デフォルトは false。",
     "alist_token": "AList トークン",
     "alist_url": "AList アドレス、例：https://alist.besscroft.com",
-    "r2_endpoint": "Cloudflare Endpoint、例：https://<ACCOUNT_ID>.r2.cloudflarestorage.com",
+    "r2_account_id": "Cloudflare ACCOUNT_ID",
     "r2_accesskey_id": "Cloudflare AccessKey_ID",
     "r2_accesskey_secret": "Cloudflare AccessKey_Secret",
     "r2_bucket": "Cloudflare Bucket バケット名（例：picimpact）",
