@@ -16,11 +16,12 @@
     "title": "欢迎登录",
     "email": "邮箱",
     "password": "密码",
-    "login": "登录",
     "forget": "忘记密码了？",
     "otp": "双因素口令",
     "goHome": "返回首页",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "signUp": "注册",
+    "signIn": "登录"
   },
   "Link": {
     "home": "首页",
@@ -219,7 +220,10 @@
     "umamiHost": "Umami Website Host",
     "umamiAnalytics": "Umami Website ID",
     "maxUploadFiles": "最大上传文件数量",
-    "inputMaxUploadFiles": "请输入最大上传文件数量"
+    "inputMaxUploadFiles": "请输入最大上传文件数量",
+    "adminImagesPerPage": "管理界面每页显示图片数量",
+    "inputAdminImagesPerPage": "请输入每页显示的图片数量",
+    "customIndexOriginEnable": "首页是否显示原图(精选图片模式)"
   },
   "Password": {
     "onePassword": "旧密码",
@@ -250,7 +254,7 @@
     "s3_direct_download": "是否启用 S3 直接下载模式，默认 false。",
     "alist_token": "alist 令牌",
     "alist_url": "AList 地址，如：https://alist.besscroft.com",
-    "r2_endpoint": "Cloudflare Endpoint 地域节点，如：https://<ACCOUNT_ID>.r2.cloudflarestorage.com",
+    "r2_account_id": "Cloudflare ACCOUNT_ID",
     "r2_accesskey_id": "Cloudflare AccessKey_ID",
     "r2_accesskey_secret": "Cloudflare AccessKey_Secret",
     "r2_bucket": "Cloudflare Bucket 存储桶名称，如：picimpact",

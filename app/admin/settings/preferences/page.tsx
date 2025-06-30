@@ -28,6 +28,8 @@ export default function Preferences() {
   const [umamiAnalytics, setUmamiAnalytics] = useState('')
   const [umamiHost, setUmamiHost] = useState('')
   const [maxUploadFiles, setMaxUploadFiles] = useState('5')
+  const [customIndexOriginEnable, setCustomIndexOriginEnable] = useState(false)
+  const [adminImagesPerPage, setAdminImagesPerPage] = useState('8')
   const t = useTranslations()
 
   const { data, isValidating, isLoading } = useSWR<{ config_key: string, config_value: string }[]>('/api/v1/settings/get-custom-info', fetcher)
@@ -46,6 +48,11 @@ export default function Preferences() {
     const maxFiles = parseInt(maxUploadFiles)
     if (isNaN(maxFiles) || maxFiles < 1) {
       toast.error('最大上传文件数量不能小于 1')
+      return
+    }
+    const imagesPerPage = parseInt(adminImagesPerPage)
+    if (isNaN(imagesPerPage) || imagesPerPage < 1) {
+      toast.error(t('Preferences.inputAdminImagesPerPage'))
       return
     }
     try {
@@ -68,7 +75,9 @@ export default function Preferences() {
           previewQuality,
           umamiHost,
           umamiAnalytics,
-          maxUploadFiles: maxFiles
+          maxUploadFiles: maxFiles,
+          customIndexOriginEnable,
+          adminImagesPerPage: imagesPerPage
         }),
       }).then(res => res.json())
       toast.success('修改成功！')
@@ -93,6 +102,8 @@ export default function Preferences() {
     setUmamiHost(data?.find((item) => item.config_key === 'umami_host')?.config_value || '')
     setUmamiAnalytics(data?.find((item) => item.config_key === 'umami_analytics')?.config_value || '')
     setMaxUploadFiles(data?.find((item) => item.config_key === 'max_upload_files')?.config_value || '5')
+    setCustomIndexOriginEnable(data?.find((item) => item.config_key === 'custom_index_origin_enable')?.config_value.toString() === 'true' || false)
+    setAdminImagesPerPage(data?.find((item) => item.config_key === 'admin_images_per_page')?.config_value || '8')
   }, [data])
 
   return (
@@ -262,6 +273,18 @@ export default function Preferences() {
               onChange={(e) => setMaxUploadFiles(e.target.value)}
             />
           </div>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="adminImagesPerPage">{t('Preferences.adminImagesPerPage')}</Label>
+            <Input
+              type="number"
+              id="adminImagesPerPage"
+              min={1}
+              disabled={isValidating || isLoading}
+              value={adminImagesPerPage}
+              placeholder={t('Preferences.inputAdminImagesPerPage')}
+              onChange={(e) => setAdminImagesPerPage(e.target.value)}
+            />
+          </div>
         </div>
         <div className="rounded space-y-4">
           <label
@@ -294,6 +317,23 @@ export default function Preferences() {
                 className="cursor-pointer"
                 onCheckedChange={checked => {
                   setPreviewImageMaxWidthLimitEnabled(checked)
+                }}
+              />
+            </div>
+          </label>
+          <label
+            htmlFor="customIndexOriginEnable"
+            className="w-full max-w-sm cursor-pointer block overflow-hidden rounded-md border border-gray-200 px-3 py-2 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
+          >
+            <span className="text-xs font-medium text-gray-700">{t('Preferences.customIndexOriginEnable')}</span>
+            <div>
+              <Switch
+                id="customIndexOriginEnable"
+                disabled={isValidating || isLoading}
+                checked={customIndexOriginEnable}
+                className="cursor-pointer"
+                onCheckedChange={checked => {
+                  setCustomIndexOriginEnable(checked)
                 }}
               />
             </div>
