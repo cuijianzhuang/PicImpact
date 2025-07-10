@@ -35,6 +35,8 @@ export default function GalleryImage({ photo, configData }: { photo: ImageType, 
     data: photo,
   }
 
+  const customIndexOriginEnable = configData?.find((item: any) => item.config_key === 'custom_index_origin_enable')?.config_value.toString() === 'true'
+
   async function downloadImg() {
     setDownload(true)
     try {
@@ -49,7 +51,7 @@ export default function GalleryImage({ photo, configData }: { photo: ImageType, 
       const storageType = photo?.url?.includes('s3') ? 's3' : 'r2'
       
       // 使用新的下载 API
-      let response = await fetch(`/api/v1/download/${photo.id}?storage=${storageType}`)
+      let response = await fetch(`/api/public/download/${photo.id}?storage=${storageType}`)
       const contentType = response.headers.get('content-type')
       
       if (contentType?.includes('application/json')) {
@@ -99,7 +101,7 @@ export default function GalleryImage({ photo, configData }: { photo: ImageType, 
         <LazyLoadImage
           width={photo.width}
           height={photo.height}
-          src={photo.url}
+          src={customIndexOriginEnable ? photo.url || photo.preview_url : photo.preview_url || photo.url}
           alt={photo.title}
           effect="blur"
           wrapperProps={{

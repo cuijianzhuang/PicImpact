@@ -27,73 +27,19 @@ export async function fetchConfigsByKeys(keys: string[]): Promise<Config[]> {
 }
 
 /**
- * 获取密钥
- * @returns {Promise<Config | null>} 密钥
+ * 根据 key 获取单个配置值
+ * @param key 配置键
+ * @param defaultValue 默认值
+ * @return {Promise<string>} 配置值
  */
-export async function fetchSecretKey(): Promise<Config | null> {
-  return await db.configs.findFirst({
+export async function fetchConfigValue(key: string, defaultValue: string = ''): Promise<string> {
+  const config = await db.configs.findFirst({
     where: {
-      config_key: 'secret_key'
+      config_key: key
     },
     select: {
-      id: true,
-      config_key: true,
-      config_value: true,
-      detail: true
+      config_value: true
     }
   })
-}
-
-/**
- * 获取 auth 状态
- * @returns {Promise<Config | null>} auth 状态
- */
-export async function queryAuthStatus(): Promise<Config | null> {
-  return await db.configs.findFirst({
-    where: {
-      config_key: 'auth_enable'
-    },
-    select: {
-      id: true,
-      config_key: true,
-      config_value: true,
-      detail: true
-    }
-  })
-}
-
-/**
- * 获取 auth 临时密钥
- * @returns {Promise<Config | null>} auth 临时密钥
- */
-export async function queryAuthTemplateSecret(): Promise<Config | null> {
-  return await db.configs.findFirst({
-    where: {
-      config_key: 'auth_temp_secret'
-    },
-    select: {
-      id: true,
-      config_key: true,
-      config_value: true,
-      detail: true
-    }
-  })
-}
-
-/**
- * 获取 auth 密钥
- * @returns {Promise<Config | null>} auth 密钥
- */
-export async function queryAuthSecret(): Promise<Config | null> {
-  return await db.configs.findFirst({
-    where: {
-      config_key: 'auth_secret'
-    },
-    select: {
-      id: true,
-      config_key: true,
-      config_value: true,
-      detail: true
-    }
-  })
+  return config?.config_value || defaultValue
 }
