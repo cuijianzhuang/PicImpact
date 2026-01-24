@@ -26,13 +26,17 @@ export default function ProgressiveImage(
   const [error, setError] = useState<string | null>(null)
   const [highResImageUrl, setHighResImageUrl] = useState<string | null>(null)
   const [highResImageLoaded, setHighResImageLoaded] = useState(false)
-  const [showWebGLViewer, setShowWebGLViewer] = useState(Boolean(props.showLightbox))
+  const [showFullScreenViewer, setShowFullScreenViewer] = useState(Boolean(props.showLightbox))
   const [webGLAvailable] = useState(() => isWebGLSupported())
 
   const webglViewerRef = useRef<WebGLImageViewerRef | null>(null)
-
   useEffect(() => {
-    setShowWebGLViewer(Boolean(props.showLightbox))
+    return () => {
+      webglViewerRef.current?.destroy()
+    }
+  }, [])
+  useEffect(() => {
+    setShowFullScreenViewer(Boolean(props.showLightbox))
   }, [props.showLightbox])
 
   useEffect(() => {
@@ -82,7 +86,7 @@ export default function ProgressiveImage(
   const dataURL = useBlurImageDataUrl(props.blurhash)
 
   const handleCloseViewer = () => {
-    setShowWebGLViewer(false)
+    setShowFullScreenViewer(false)
     if (props.onShowLightboxChange) {
       props.onShowLightboxChange(false)
     }
@@ -127,124 +131,123 @@ export default function ProgressiveImage(
           </div>
         )}
       </Activity>
-      {highResImageUrl && (
-        /* 高清图已加载 - 根据状态选择渲染方式 */
-        <Activity mode={highResImageLoaded && !showWebGLViewer ? 'visible' : 'hidden'}>
-          <img
-            className="object-contain md:max-h-[90vh] cursor-pointer"
-            src={highResImageUrl}
-            width={props.width}
-            height={props.height}
-            alt={props.alt || 'image'}
-            onClick={() => {
-              setShowWebGLViewer(true)
-              if (props.onShowLightboxChange) {
-                props.onShowLightboxChange(true)
-              }
-            }}
-            onLoad={() => {
-              setHighResImageLoaded(true)
-            }}
-          />
-        </Activity>
-      )}
-      {highResImageUrl && webGLAvailable && showWebGLViewer ? (
-        <div
-          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
-          onClick={(e) => {
-            // 点击背景关闭
-            if (e.target === e.currentTarget) {
-              handleCloseViewer()
-            }
-          }}
-        >
-          {/* 关闭按钮 */}
-          <button
-            onClick={handleCloseViewer}
-            className="absolute top-4 right-4 z-[110] p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label={t('Button.close')}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-white"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-
-          {/* 操作提示 */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-sm pointer-events-none">
-            {t('Tips.zoomHint')}
-          </div>
-
-          {/* WebGL 图片查看器 */}
-          <div className="w-full h-full">
-            <WebGLImageViewer
-              ref={webglViewerRef}
+      {highResImageUrl ? (
+        <>
+          <Activity mode={highResImageLoaded && !showFullScreenViewer ? 'visible' : 'hidden'}>
+            <img
+              className="object-contain md:max-h-[90vh] cursor-pointer"
               src={highResImageUrl}
               width={props.width}
               height={props.height}
-              className="w-full h-full"
-              initialScale={1}
-              minScale={0.5}
-              maxScale={10}
-              limitToBounds={true}
-              smooth={true}
-              debug={process.env.NODE_ENV === 'development'}
+              alt={props.alt || 'image'}
+              onClick={() => {
+                setShowFullScreenViewer(true)
+                if (props.onShowLightboxChange) {
+                  props.onShowLightboxChange(true)
+                }
+              }}
+              onLoad={() => {
+                setHighResImageLoaded(true)
+              }}
             />
-          </div>
-        </div>
-      ) : null}
-      {highResImageUrl && !webGLAvailable && showWebGLViewer ? (
-        <div
-          className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center overflow-auto"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              handleCloseViewer()
-            }
-          }}
-        >
-          <button
-            onClick={handleCloseViewer}
-            className="absolute top-4 right-4 z-[110] p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-            aria-label={t('Button.close')}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-white"
+          </Activity>
+          <Activity mode={showFullScreenViewer ? 'visible' : 'hidden'}>
+            {webGLAvailable ? <div
+              className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center"
+              onClick={(e) => {
+                // 点击背景关闭
+                if (e.target === e.currentTarget) {
+                  handleCloseViewer()
+                }
+              }}
             >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          {/* WebGL 不可用提示 */}
-          <div className="absolute top-4 left-4 text-white/70 text-sm bg-black/50 px-3 py-1 rounded">
-            {t('Tips.webglUnavailable')}
-          </div>
-          <img
-            className="max-w-full max-h-full object-contain"
-            src={highResImageUrl}
-            alt={props.alt || 'image'}
-          />
-        </div>
+              {/* 关闭按钮 */}
+              <button
+                onClick={handleCloseViewer}
+                className="absolute top-4 right-4 z-[110] p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                aria-label={t('Button.close')}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-white"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+
+              {/* 操作提示 */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-sm pointer-events-none">
+                {t('Tips.zoomHint')}
+              </div>
+
+              {/* WebGL 图片查看器 */}
+              <div className="w-full h-full">
+                <WebGLImageViewer
+                  ref={webglViewerRef}
+                  src={highResImageUrl}
+                  width={props.width}
+                  height={props.height}
+                  className="w-full h-full"
+                  initialScale={1}
+                  minScale={0.5}
+                  maxScale={10}
+                  limitToBounds={true}
+                  smooth={true}
+                  debug={process.env.NODE_ENV === 'development'}
+                />
+              </div>
+            </div> : <div
+              className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center overflow-auto"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  handleCloseViewer()
+                }
+              }}
+            >
+              <button
+                onClick={handleCloseViewer}
+                className="absolute top-4 right-4 z-[110] p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                aria-label={t('Button.close')}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-white"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+              {/* WebGL 不可用提示 */}
+              <div className="absolute top-4 left-4 text-white/70 text-sm bg-black/50 px-3 py-1 rounded">
+                {t('Tips.webglUnavailable')}
+              </div>
+              <img
+                className="max-w-full max-h-full object-contain"
+                src={highResImageUrl}
+                alt={props.alt || 'image'}
+              />
+            </div>}
+          </Activity>
+        </>
       ) : null}
+
     </div>
   )
 }
