@@ -69,48 +69,50 @@ export default function DockMenu(props: Readonly<AlbumDataProps>) {
         </Dock>
       </div>
       <Command {...props} />
-      <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
-        <Modal.Container variant='blur' placement='center' isDismissable>
-          <Modal.Dialog className="sm:max-w-lg sm:min-w-sm">
-            {({}) => (
-              <>
-                <Modal.Header>
-                  <Modal.Heading>
-                    {t('Words.album')}
-                  </Modal.Heading>
-                </Modal.Header>
-                <Modal.Body>
-                  <ListBox aria-label="Albums" className="w-full sm:max-w-lg" selectionMode="single">
-                    {Array.isArray(props.data) && props.data.length > 0 &&
-                      props.data.map((album: AlbumType) => (
-                        <ListBox.Item
-                          id={album.id}
-                          textValue={album.name}
-                          onClick={() => {
-                            setCommand(false)
-                            router.push(album.album_value)
-                          }}
-                        >
-                          <GalleryThumbnailsIcon
-                            className='text-black dark:text-white'
-                            size={18}
-                            aria-label={album.name}
-                          />
-                          <div className="flex flex-col">
-                            <Label>{album.name}</Label>
-                          </div>
-                          <ListBox.ItemIndicator />
-                        </ListBox.Item>
-                      ))
-                    }
-                  </ListBox>
-                </Modal.Body>
-                <Modal.Footer>
-                </Modal.Footer>
-              </>
-            )}
-          </Modal.Dialog>
-        </Modal.Container>
+      <Modal>
+        <Modal.Backdrop variant="blur" isOpen={isOpen} onOpenChange={setIsOpen}>
+          <Modal.Container placement="center">
+            <Modal.Dialog className="sm:max-w-lg sm:min-w-sm">
+              {({}) => (
+                <>
+                  <Modal.Header>
+                    <Modal.Heading>
+                      {t('Words.album')}
+                    </Modal.Heading>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <ListBox aria-label="Albums" className="w-full sm:max-w-lg" selectionMode="single">
+                      {Array.isArray(props.data) && props.data.length > 0 &&
+                        props.data.map((album: AlbumType) => (
+                          <ListBox.Item
+                            id={album.id}
+                            textValue={album.name}
+                            onClick={() => {
+                              setCommand(false)
+                              router.push(album.album_value)
+                            }}
+                          >
+                            <GalleryThumbnailsIcon
+                              className='text-black dark:text-white'
+                              size={18}
+                              aria-label={album.name}
+                            />
+                            <div className="flex flex-col">
+                              <Label>{album.name}</Label>
+                            </div>
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))
+                      }
+                    </ListBox>
+                  </Modal.Body>
+                  <Modal.Footer>
+                  </Modal.Footer>
+                </>
+              )}
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );
