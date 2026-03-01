@@ -7,7 +7,6 @@ dist
 **/skills/**
 skills-lock.json
 tsconfig.tsbuildinfo
-
 .claude/
 # next.js
 /.next/
